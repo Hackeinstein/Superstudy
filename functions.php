@@ -223,7 +223,7 @@ function call_gemini(string $model, string $api_key, string $prompt, ?string $im
 }
 
 /**
- * Make cURL request to AI API
+ * Make cURL request to AI API with detailed error handling
  */
 function make_curl_request(string $url, array $data, array $headers): array {
     $ch = curl_init();
@@ -235,23 +235,32 @@ function make_curl_request(string $url, array $data, array $headers): array {
         CURLOPT_POSTFIELDS => json_encode($data),
         CURLOPT_HTTPHEADER => $headers,
         CURLOPT_TIMEOUT => 120,
-        CURLOPT_SSL_VERIFYPEER => true
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_HEADER => true
     ]);
     
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
     $error = curl_error($ch);
     curl_close($ch);
     
     if ($error) {
-        return ['success' => false, 'error' => 'cURL error: ' . $error];
+        return [
+            'success' => false, 
+            'error' => 'Network error: ' . $error,
+            'error_type' => 'network'
+        ];
     }
     
-    $decoded = json_decode($response, true);
+    // Separate headers and body
+    $response_headers = substr($response, 0, $header_size);
+    $body = substr($response, $header_size);
+    $decoded = json_decode($body, true);
     
+    // Handle different HTTP status codes
     if ($http_code >= 400) {
-        $error_msg = $decoded['error']['message'] ?? $decoded['error'] ?? 'API request failed';
-        return ['success' => false, 'error' => $error_msg, 'http_code' => $http_code];
+        return parse_api_error($http_code, $decoded, $response_headers);
     }
     
     // Extract content for OpenAI-compatible responses
@@ -261,6 +270,118 @@ function make_curl_request(string $url, array $data, array $headers): array {
         'success' => true,
         'data' => $decoded,
         'content' => $content
+    ];
+}
+
+/**
+ * Parse API error responses with detailed, user-friendly messages
+ */
+function parse_api_error(int $http_code, ?array $response, string $headers): array {
+    $error_type = 'api_error';
+    $retry_after = null;
+    
+    // Extract retry-after header if present
+    if (preg_match('/retry-after:\s*(\d+)/i', $headers, $matches)) {
+        $retry_after = (int)$matches[1];
+    }
+    
+    // Handle rate limiting (429)
+    if ($http_code === 429) {
+        $error_type = 'rate_limit';
+        $wait_time = $retry_after ?? 60;
+        $error_msg = "Rate limit exceeded. Please wait {$wait_time} seconds before trying again.";
+        
+        // Try to get more specific message from response
+        if (isset($response['error']['message'])) {
+            $api_msg = $response['error']['message'];
+            if (strpos($api_msg, 'quota') !== false) {
+                $error_msg = "API quota exceeded. You may need to upgrade your plan or wait until your quota resets.";
+            }
+        }
+        
+        return [
+            'success' => false,
+            'error' => $error_msg,
+            'error_type' => $error_type,
+            'http_code' => $http_code,
+            'retry_after' => $wait_time
+        ];
+    }
+    
+    // Handle authentication errors (401, 403)
+    if ($http_code === 401 || $http_code === 403) {
+        $error_type = 'auth_error';
+        $error_msg = 'Invalid or expired API key. Please check your API key in project settings.';
+        
+        if (isset($response['error']['message'])) {
+            if (strpos($response['error']['message'], 'incorrect') !== false) {
+                $error_msg = 'Incorrect API key. Please verify your API key is correct.';
+            } elseif (strpos($response['error']['message'], 'permission') !== false) {
+                $error_msg = 'API key lacks permission for this model. Try a different model.';
+            }
+        }
+        
+        return [
+            'success' => false,
+            'error' => $error_msg,
+            'error_type' => $error_type,
+            'http_code' => $http_code
+        ];
+    }
+    
+    // Handle model not found (404)
+    if ($http_code === 404) {
+        $error_type = 'model_error';
+        $error_msg = 'Model not found. The selected model may not be available for your account.';
+        return [
+            'success' => false,
+            'error' => $error_msg,
+            'error_type' => $error_type,
+            'http_code' => $http_code
+        ];
+    }
+    
+    // Handle content/safety filters (400)
+    if ($http_code === 400) {
+        $error_type = 'request_error';
+        $error_msg = $response['error']['message'] ?? 'Bad request. The content may have triggered safety filters.';
+        
+        if (isset($response['error']['message'])) {
+            $api_msg = strtolower($response['error']['message']);
+            if (strpos($api_msg, 'context') !== false || strpos($api_msg, 'token') !== false) {
+                $error_msg = 'Document is too large. Try uploading a smaller document.';
+            } elseif (strpos($api_msg, 'safety') !== false || strpos($api_msg, 'blocked') !== false) {
+                $error_msg = 'Content was blocked by safety filters. Try different document content.';
+            }
+        }
+        
+        return [
+            'success' => false,
+            'error' => $error_msg,
+            'error_type' => $error_type,
+            'http_code' => $http_code
+        ];
+    }
+    
+    // Handle server errors (500+)
+    if ($http_code >= 500) {
+        $error_type = 'server_error';
+        $error_msg = 'AI service is temporarily unavailable. Please try again in a few minutes.';
+        return [
+            'success' => false,
+            'error' => $error_msg,
+            'error_type' => $error_type,
+            'http_code' => $http_code
+        ];
+    }
+    
+    // Generic error fallback
+    $error_msg = $response['error']['message'] ?? $response['error'] ?? 'Unknown API error (HTTP ' . $http_code . ')';
+    return [
+        'success' => false,
+        'error' => $error_msg,
+        'error_type' => $error_type,
+        'http_code' => $http_code
     ];
 }
 
@@ -329,9 +450,7 @@ function extract_text_from_file(string $file_path, string $file_type): string {
         case 'txt':
             return file_get_contents($file_path);
         case 'pdf':
-            // For PDF, we'll use AI to extract text (multimodal)
-            // Return empty and let the AI handle it
-            return '[PDF document - text will be extracted via AI]';
+            return extract_text_from_pdf($file_path);
         case 'jpg':
         case 'jpeg':
         case 'png':
@@ -340,6 +459,45 @@ function extract_text_from_file(string $file_path, string $file_type): string {
         default:
             return '';
     }
+}
+
+/**
+ * Extract text from PDF using pdftotext (poppler)
+ */
+function extract_text_from_pdf(string $file_path): string {
+    // Check if pdftotext is available
+    $pdftotext_path = trim(shell_exec('which pdftotext 2>/dev/null') ?? '');
+    
+    if (empty($pdftotext_path)) {
+        // Fallback: try common paths
+        $common_paths = [
+            '/usr/local/bin/pdftotext',
+            '/opt/homebrew/bin/pdftotext',
+            '/usr/bin/pdftotext'
+        ];
+        foreach ($common_paths as $path) {
+            if (file_exists($path) && is_executable($path)) {
+                $pdftotext_path = $path;
+                break;
+            }
+        }
+    }
+    
+    if (empty($pdftotext_path)) {
+        // pdftotext not available, use AI for extraction
+        return '[PDF document - text will be extracted via AI vision]';
+    }
+    
+    // Extract text using pdftotext
+    $escaped_path = escapeshellarg($file_path);
+    $output = shell_exec("{$pdftotext_path} -layout {$escaped_path} - 2>/dev/null");
+    
+    if ($output && strlen(trim($output)) > 50) {
+        return trim($output);
+    }
+    
+    // If extraction failed or got minimal text, fallback to AI
+    return '[PDF document - text will be extracted via AI vision]';
 }
 
 /**

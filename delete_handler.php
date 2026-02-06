@@ -104,6 +104,53 @@ switch ($action) {
         echo json_encode(['success' => true, 'message' => 'Content deleted']);
         break;
         
+    case 'delete_project':
+        $project_id = (int)($input['project_id'] ?? 0);
+        $redirect = $input['redirect'] ?? null;
+        
+        // Verify ownership
+        $stmt = $mysqli->prepare('SELECT * FROM projects WHERE id = ? AND user_id = ?');
+        $stmt->bind_param('ii', $project_id, $user_id);
+        $stmt->execute();
+        $project = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        
+        if (!$project) {
+            if ($redirect) {
+                header('Location: ' . $redirect);
+                exit;
+            }
+            echo json_encode(['success' => false, 'error' => 'Project not found']);
+            exit;
+        }
+        
+        // Get all documents to delete files
+        $doc_stmt = $mysqli->prepare('SELECT file_path FROM documents WHERE project_id = ?');
+        $doc_stmt->bind_param('i', $project_id);
+        $doc_stmt->execute();
+        $docs = $doc_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $doc_stmt->close();
+        
+        // Delete files from disk
+        foreach ($docs as $doc) {
+            if (file_exists($doc['file_path'])) {
+                unlink($doc['file_path']);
+            }
+        }
+        
+        // Delete project (cascades to documents and generated_content via FK)
+        $del_stmt = $mysqli->prepare('DELETE FROM projects WHERE id = ?');
+        $del_stmt->bind_param('i', $project_id);
+        $del_stmt->execute();
+        $del_stmt->close();
+        
+        if ($redirect) {
+            header('Location: ' . $redirect);
+            exit;
+        }
+        echo json_encode(['success' => true, 'message' => 'Project deleted']);
+        break;
+        
     default:
         echo json_encode(['success' => false, 'error' => 'Invalid action']);
 }

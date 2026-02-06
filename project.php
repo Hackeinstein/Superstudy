@@ -276,6 +276,11 @@ $page_title = $is_create_mode ? 'Create New Project' : sanitize_output($project[
                                 <small class="text-muted">Generated</small>
                             </div>
                         </div>
+                        
+                        <hr class="my-3">
+                        <a href="project_settings.php?id=<?= $project_id ?>" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-gear me-2"></i>Project Settings
+                        </a>
                     </div>
                 </div>
                 

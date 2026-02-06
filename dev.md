@@ -23,10 +23,10 @@ This file tracks development progress and future enhancements.
 ## Roadmap / Future Enhancements
 
 ### High Priority
-- [ ] **PDF Text Extraction** - Add server-side PDF parsing (pdftotext or Smalot library)
-- [ ] **Better Error Messages** - Show specific API errors to users
-- [ ] **Rate Limit Handling** - Detect and display rate limit errors gracefully
-- [ ] **Project Settings** - Allow editing project name, description, API key
+- [x] **PDF Text Extraction** - Added pdftotext via poppler for server-side extraction
+- [x] **Better Error Messages** - Detailed error parsing with specific user-friendly messages
+- [x] **Rate Limit Handling** - Detects 429 errors and shows wait times
+- [x] **Project Settings** - New `project_settings.php` for editing projects
 
 ### Medium Priority
 - [ ] **Batch Generation** - Generate all content types for all documents at once
@@ -111,3 +111,8 @@ tail -f /Applications/XAMPP/xamppfiles/logs/php_error_log
 - Added dynamic model fetching from API keys
 - Fixed uploads folder permissions
 - Created git repo
+- Implemented all high priority features:
+  - PDF text extraction via pdftotext (poppler)
+  - Enhanced error messages with rate limit detection
+  - Project settings page with edit/delete
+  - Better HTTP error code handling
