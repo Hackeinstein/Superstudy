@@ -1,0 +1,31 @@
+# Ignore uploads directory contents but keep the directory
+uploads/*
+!uploads/.htaccess
+!uploads/.gitkeep
+
+# Environment and secrets
+.env
+config.local.php
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Dependencies (if any added later)
+vendor/
+node_modules/
+
+# Temporary files
+*.tmp
+*.bak

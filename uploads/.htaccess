@@ -1,0 +1,36 @@
+# Deny direct access to uploaded files
+# Prevent execution of any scripts
+
+# Apache 2.4+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+# Apache 2.2
+<IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+</IfModule>
+
+# Prevent script execution
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phps|cgi|pl|py|sh|bash)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Disable directory browsing
+Options -Indexes
+
+# Disable execution
+Options -ExecCGI
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .phps .cgi .pl .py
+
+# Force download instead of display (extra safety)
+<IfModule mod_headers.c>
+    Header set Content-Disposition "attachment"
+</IfModule>

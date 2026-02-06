@@ -1,0 +1,479 @@
+/**
+ * SuperStudy - Custom Styles
+ * 
+ * Modern dark theme with glassmorphism and vibrant accents
+ */
+
+/* Spin animation for loading icons */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============================================
+   CSS Variables & Theme
+   ============================================ */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+
+    --glass-bg: rgba(30, 30, 46, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --card-hover: rgba(102, 126, 234, 0.1);
+}
+
+body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+}
+
+/* ============================================
+   Authentication Page
+   ============================================ */
+.auth-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 440px;
+}
+
+.auth-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.auth-logo {
+    width: 80px;
+    height: 80px;
+    background: var(--primary-gradient);
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 2.5rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+}
+
+/* ============================================
+   Navigation
+   ============================================ */
+.navbar {
+    backdrop-filter: blur(10px);
+    background: rgba(30, 30, 46, 0.9) !important;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.4rem;
+}
+
+/* ============================================
+   Cards & Project Cards
+   ============================================ */
+.card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.project-card {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+}
+
+.project-card .card-title a:hover {
+    color: #667eea !important;
+}
+
+/* Provider Badges */
+.provider-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-openai {
+    background: linear-gradient(135deg, #10a37f 0%, #1a7f64 100%);
+    color: white;
+}
+
+.badge-anthropic {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    color: white;
+}
+
+.badge-google-gemini {
+    background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+    color: white;
+}
+
+.badge-xai-grok {
+    background: linear-gradient(135deg, #1da1f2 0%, #0d8ecf 100%);
+    color: white;
+}
+
+.badge-openrouter {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+}
+
+/* ============================================
+   Upload Zone
+   ============================================ */
+.upload-zone {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.upload-zone.dragover {
+    transform: scale(1.02);
+}
+
+/* ============================================
+   Quiz Styles
+   ============================================ */
+.quiz-container {
+    max-width: 100%;
+}
+
+.quiz-question h6 {
+    color: #e2e8f0;
+    margin-bottom: 1rem;
+}
+
+.quiz-option {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.quiz-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.quiz-option .option-letter {
+    font-weight: 600;
+    margin-right: 0.5rem;
+    color: #667eea;
+}
+
+.quiz-option.correct.revealed {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: #10b981;
+}
+
+.quiz-option .correct-icon {
+    display: none;
+    position: absolute;
+    right: 1rem;
+    color: #10b981;
+}
+
+.quiz-option.correct.revealed .correct-icon {
+    display: inline;
+}
+
+/* ============================================
+   Flashcard Styles
+   ============================================ */
+.flashcard-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.flashcard {
+    height: 200px;
+    perspective: 1000px;
+    cursor: pointer;
+}
+
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.flashcard-front {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.flashcard-back {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    transform: rotateY(180deg);
+}
+
+.flashcard .card-number {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+
+/* ============================================
+   Notes Styles
+   ============================================ */
+.notes-content {
+    line-height: 1.8;
+}
+
+.notes-content h3,
+.notes-content h4,
+.notes-content h5 {
+    color: #667eea;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.notes-content ul {
+    padding-left: 1.5rem;
+}
+
+.notes-content li {
+    margin-bottom: 0.5rem;
+}
+
+.notes-content strong {
+    color: #f472b6;
+}
+
+/* ============================================
+   Summary Styles
+   ============================================ */
+.summary-content {
+    line-height: 1.8;
+    color: #e2e8f0;
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+.empty-state {
+    padding: 3rem;
+}
+
+.empty-state i {
+    opacity: 0.3;
+}
+
+/* ============================================
+   Accordion Customization
+   ============================================ */
+.accordion-item {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem !important;
+    overflow: hidden;
+}
+
+.accordion-button {
+    background: rgba(255, 255, 255, 0.03);
+    color: #e2e8f0;
+}
+
+.accordion-button:not(.collapsed) {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+.accordion-body {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   Form Enhancements
+   ============================================ */
+.form-control,
+.form-select {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    color: #e2e8f0;
+}
+
+.input-group-text {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #a0aec0;
+}
+
+/* ============================================
+   Buttons
+   ============================================ */
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.btn-success {
+    background: var(--success-gradient);
+    border: none;
+}
+
+/* ============================================
+   Table Styles
+   ============================================ */
+.table {
+    color: #e2e8f0;
+}
+
+.table-hover tbody tr:hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+/* ============================================
+   Alerts
+   ============================================ */
+.alert-info {
+    background: rgba(79, 172, 254, 0.1);
+    border-color: rgba(79, 172, 254, 0.3);
+    color: #4facfe;
+}
+
+.alert-warning {
+    background: rgba(251, 191, 36, 0.1);
+    border-color: rgba(251, 191, 36, 0.3);
+    color: #fbbf24;
+}
+
+/* ============================================
+   Scrollbar
+   ============================================ */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.7);
+}
+
+/* ============================================
+   Loading Spinner
+   ============================================ */
+.spinner-border {
+    animation: spinner-border 0.75s linear infinite;
+}
+
+/* ============================================
+   Responsive Adjustments
+   ============================================ */
+@media (max-width: 768px) {
+    .auth-card {
+        padding: 1.5rem;
+    }
+
+    .flashcard-container {
+        grid-template-columns: 1fr;
+    }
+
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.4rem;
+    }
+}
